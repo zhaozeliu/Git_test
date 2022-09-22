@@ -1,0 +1,250 @@
+﻿github
+安装git
+Rstudio tools global git 创建或使用ssh private 
+github 网页个人设置 ssh 上传ssh pub
+创建repository， code 将ssh 复制
+Rstudio 创建project version control，URL 为复制的repository的ssh， 当弹出警告窗口时输入yes
+在本地project中创建文件夹，空文件夹不能上传
+文件夹放入文件后点开Rstudio的本地project，在右上角git中选中要上传的文件，点击commit在必须加入comment然后点击绿色箭头push可上传到github网上
+
+
+ssh zhaoze@beluga.computecanada.ca
+password liuzhaoze98513yb  scratch里面文件3个月不用清理  project里文件可跟别人共享 home/zhaoze 下有50G可放结果
+cd /scratch/zhaoze/sablefish  移动到sablefish目录
+
+
+ubuntu 用户名zhaoze 98513yb
+路径C:\Users\liu\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc\LocalState\rootfs\home\zhaoze
+sudo apt-get install zip     安装unzip
+pwd   显示当前路径
+
+cd  /srv/shiny-server    移动到目录
+sudo cp -R shintapp /srv/shiny-server/   root下复制shintapp中R到/srv/shiny-server/下
+sudo rm /srv/shiny-server/sample-apps     删除文件   rmdir删除文件夹
+sudo su - -c "R -e \"install. packages('shiny', repos='http://cran.rstudio.com/')\""   在根目录下装R package 把shiny改为别的其他不变
+
+
+cd  /home/zhaoze/scratch
+module spider vcftools   找vcftools版本
+module spider r   找r版本
+module load r/4.0.2  加载r 4.0.2
+R     进入R  4.0.2
+
+cd D:\zhaoze   cd /d d: 移动到D盘目录下   windows
+tar xvfz vcftools_0.1.6.tar.gz
+
+Ubuntu    cd /mnt/d      到d盘目录下
+
+
+
+
+
+创建要运行的R脚本和.sh脚本  放入compute Canada路径下
+
+.sh里面为：
+
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=1  #用几核
+#SBATCH --mem=5G # GiB of memery 内存大小
+#SBATCH -t 0-00:15 # Running time hr:min  时间
+Rscript --vanilla $HOME/projects/def-ubcxzh/shuaiu/spectrum/jul28_relabelling/relabelling_jul28.R $1 $2 > $HOME/projects/def-ubcxzh/shuaiu/spectrum/jul28_relabelling/relabelling_jul28.Rout 2>&1 # 运行的和输出的文件目录
+
+
+再运行
+# cd projects/def-ubcxzh/shuaiu/spectrum/jul28_relabelling  #要运行的文件名字  路径
+
+# sbatch relabelling_jul28.sh  #运行.sh文件  
+# squeue -u zhaoze  #显示该用户的待运行文件信息
+# seff xxxxx # xxx 为 job ID 
+
+
+sbatch --array=0-7       # $SLURM_ARRAY_TASK_ID takes values from 0 to 7 inclusive  （在下面运行的语句中的  $SLURM_ARRAY_TASK_ID  值分别为0到7依次运行 ）   
+sbatch --array=1,3,5,7   # $SLURM_ARRAY_TASK_ID              takes the listed values
+sbatch --array=1-7:2     # Step-size of 2, same as the previous example
+sbatch --array=1-100%10  # Allows no more than 10 of the jobs to run simultaneously
+
+vcftools --gzvcf raw.vcf.gz --max-missing 0.5 --mac 3 --minQ 30 --recode --recode-INFO-all --out raw.g5mac3   至少50%的个体成功被snp calling的位点，最低质量分数为30的位点，次要等位基因计数为3的位点。
+将0.5改成0.1 0.2 .....10个数字运行10次 
+
+则code为 vcftools --gzvcf raw.vcf.gz --max-missing  0.1*$SLURM_ARRAY_TASK_ID --mac 3 --minQ 30 --recode --recode-INFO-all --out raw.g5mac3
+之后再在最前面#SBATCH -t 0-00:15 # Running time hr:min前加上 #sbatch --array=1-10      不需要写 # $SLURM_ARRAY_TASK_ID
+
+
+
+
+At every site, we applied functional principal component analysis (FPCA) to the 20-year weekly average Fecal Coliform bacteria measurements.
+
+
+
+
+
+
+
+
+①在Ubuntu中输入如下内容：
+
+   sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+
+   lsb_release -c
+
+   sudo vim /etc/apt/sources.list
+
+②输入ggdG删除sources.list中的所有内容
+
+③输入i进入编辑模式
+
+④将以下内容黏贴到sources.list中(将默认的下载源替换为阿里源)
+
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+
+# deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+
+# deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+
+# deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+
+# deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+
+# deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+
+⑤按Esc，输入:wq，保存并退出
+
+⑥在Ubuntu中输入以下内容进行更新
+
+sudo apt-get update
+
+sudo apt-get upgrade
+
+10、WSL的安装和设置初步完成 作者：Vaciller https://www.bilibili.com/read/cv15545635 出处：bilibili
+
+
+
+C:\Users\liu\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc\LocalState\rootfs\home\zhaoze             ubuntu 文件地址
+    
+
+
+错误sbatch: error: Batch script contains DOS line breaks (\r\n)
+sbatch: error: instead of expected UNIX line breaks (\n).
+
+先执行dos2unix 111.sh
+
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=1  
+#SBATCH --mem=5G 
+#SBATCH -t 0-00:15 
+Rscript --vanilla $lustre04/scratch/zhaoze/sablefish/111.R $1 $2 > $lustre04/scratch/zhaoze/sablefish/222.Rout 2>&1 
+
+
+
+gzip -dk V350054058_L03_FISbcnoR164272-739_1.fq.gz   解压文件到当前文件夹中  若保留压缩文件则-dk变为-d
+gzip -dk file1 file2 file3 解压多个文件
+
+cd /lustre04/scratch/zhaoze/sablefish/L519084
+
+cat V350054058_L03_FISbcnoR164272-739_1.fq.gz V350054058_L04_FISbcnoR164272-739_1.fq.gz > L519084_1.fq.gz 合并第一条链
+
+cat V350054058_L03_FISbcnoR164272-739_2.fq.gz V350054058_L04_FISbcnoR164272-739_2.fq.gz > L519084_2.fq.gz 合并第二条链
+
+运行seqtk前先 module load nixpkgs/16.09  module load gcc/7.3.0 再 module load seqtk/1.3
+
+gzip -dk L519084_1.fq.gz先解开合并的压缩文件
+
+seqtk sample -s100 L519084_1.fq 0.1 > 10L519084_1.fq 按照10%随机提取 -s100为设置seed使得第二条链相同随机的位置downsample
+seqtk sample -s100 L519084_2.fq 0.1 > 10L519084_2.fq
+
+
+循环array
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=1  
+#SBATCH --mem=1G
+#SBATCH --array=4-10 
+#SBATCH -t 0-10:15 
+seqtk sample -s$SLURM_ARRAY_TASK_ID L519084_1.fq 0.$SLURM_ARRAY_TASK_ID > $SLURM_ARRAY_TASK_ID.L519084_1.fq; seqtk sample -s$SLURM_ARRAY_TASK_ID L519084_2.fq 0.$SLURM_ARRAY_TASK_ID > $SLURM_ARRAY_TASK_ID.L519084_2.fq
+
+
+
+
+
+module load StdEnv/2020 ; module load pilon/1.24
+
+
+bwa index /sablefish/ref.fasta  对ref.fasta建立索引
+
+将fastq变为bam方式
+bowtie2-build $lustre04/scratch/zhaoze/sablefish/ref.fasta bowtie2ref 用bowtie2对ref.fasta创建索引,输出bowtie2ref index文件
+
+双端时
+
+bowtie2 -x /lustre04/scratch/zhaoze/sablefish/bowtie2ref -1 /lustre04/scratch/zhaoze/sablefish/L519084/10L519084_1.fq -2 /lustre04/scratch/zhaoze/sablefish/L519084/10L519084_2.fq -S /lustre04/scratch/zhaoze/sablefish/L519084/10L519084.sam 将downsample 10%的L519084.sq 转换为sam文件
+
+单端时
+bowtie2 -x /lustre04/scratch/zhaoze/sablefish/bowtie2ref -U /lustre04/scratch/zhaoze/sablefish/L519084/40L519084.fq -S /lustre04/scratch/zhaoze/sablefish/L519084/sam40L519084.sam 将downsample 40%的L519084.sq 转换为sam文件
+
+sbatch 111.sh  #运行.sh文件    sq查看当前的job 列表没东西为运行完
+
+module load samtools/1.15.1 加载samtools
+
+
+bgzip 10L519084.sam 将sam压缩bgz
+gzip -dk 10L519084.sam.gz先解开合并的压缩文件
+
+samtools view -S -b 10L519084.sam > 10L519084.bam  将sam 文件转为 bam
+
+samtools view 10L519084.bam | head 查看
+samtools sort 10L519084.bam -o 10L519084.sorted.bam 排序
+samtools index 10L519084.sorted.bam 生成index文件(必要)
+
+samtools faidx ref.fasta 产生.fai 文件
+
+cp ref.fasta /lustre04/scratch/zhaoze/sablefish/L519088 复制参考基因ref到文件
+
+polish    
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=1  
+#SBATCH --mem=64G 
+#SBATCH -t 0-10:15 
+java -Xmx32G -jar $EBROOTPILON/pilon.jar --genome ref.fasta --bam 10L519084.sorted.bam --output 10L519084.sorted.polished
+
+
+
+
+GATK  HaplotypeCaller SNP calling
+module load nixpkgs/16.09
+module load gatk/3.8
+java -jar $EBROOTGATK/GenomeAnalysisTK.jar -T HaplotypeCaller -R ref.fasta -I L519088.sorted.bam -o L519088.sorted.g.vcf.gz -ERC GVCF;
+
+
+创建read group
+module load picard/2.1.1
+java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups I=L519088.sorted.bam O=L519088.sorted.readgroup.bam RGID=4 RGLB=lib1 RGPL=illumina RGPU=unit1 RGSM=20
+
+
+java -jar picard.jar AddOrReplaceReadGroups I=input.bam \
+      O=output.bam \
+      RGID=4 \
+      RGLB=lib1 \
+      RGPL=illumina \
+      RGPU=unit1 \
+      RGSM=20
+
+
+
+
