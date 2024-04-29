@@ -9,6 +9,7 @@ Rstudio 创建project version control，URL 为复制的repository的ssh， 当�
 
 
 ssh zhaoze@beluga.computecanada.ca
+ssh zhaoze@narval.computecanada.ca   /lustre07/scratch/zhaoze/
 password liuzhaoze98513yb  scratch里面文件3个月不用清理  project里文件可跟别人共享 home/zhaoze 下有50G可放结果
 cd /scratch/zhaoze/sablefish  移动到sablefish目录
 
@@ -150,7 +151,7 @@ Rscript --vanilla $lustre04/scratch/zhaoze/sablefish/111.R $1 $2 > $lustre04/scr
 
 
 
-gzip -dk V350054058_L03_FISbcnoR164272-739_1.fq.gz   解压文件到当前文件夹中  若保留压缩文件则-dk变为-d
+gzip -dk V350054058_L03_FISbcnoR164272-739_1.fq.gz   解压文件到当前文件夹中  若不保留压缩文件则-dk变为-d
 gzip -dk file1 file2 file3 解压多个文件
 
 cd /lustre04/scratch/zhaoze/sablefish/L519084
@@ -162,7 +163,7 @@ cat V350054058_L03_FISbcnoR164272-739_2.fq.gz V350054058_L04_FISbcnoR164272-739_
 运行seqtk前先 module load nixpkgs/16.09  module load gcc/7.3.0 再 module load seqtk/1.3
 
 gzip -dk L519084_1.fq.gz先解开合并的压缩文件
-
+gzip -d -k L519089_L03_1.fq.gz 不删除gz
 seqtk sample -s100 L519084_1.fq 0.1 > 10L519084_1.fq 按照10%随机提取 -s100为设置seed使得第二条链相同随机的位置downsample
 seqtk sample -s100 L519084_2.fq 0.1 > 10L519084_2.fq
 
@@ -197,6 +198,18 @@ bowtie2 -x /lustre04/scratch/zhaoze/sablefish/bowtie2ref -1 /lustre04/scratch/zh
 bowtie2 -x /lustre04/scratch/zhaoze/sablefish/bowtie2ref -U /lustre04/scratch/zhaoze/sablefish/L519084/40L519084.fq -S /lustre04/scratch/zhaoze/sablefish/L519084/sam40L519084.sam 将downsample 40%的L519084.sq 转换为sam文件
 
 sbatch 111.sh  #运行.sh文件    sq查看当前的job 列表没东西为运行完
+
+
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=15  
+#SBATCH --mem=2G 
+#SBATCH --tmp=2G
+#SBATCH -t 0-10:15 
+java -Xms10g -Xmx38g -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary R=fishgenomic.fasta O=fishgenomic.dict
+
+
 
 module load samtools/1.15.1 加载samtools
 
@@ -244,6 +257,363 @@ java -jar picard.jar AddOrReplaceReadGroups I=input.bam \
       RGPL=illumina \
       RGPU=unit1 \
       RGSM=20
+
+
+bcftools query -l variants.GATK.iteration.1.Full.sorted.vcf.gz  查看合并的vcf文件里面sample的名字
+bcftools view -s N519094 variants.GATK.iteration.1.Full.sorted.vcf.gz > N519084.vcf  查看sample的vcf
+
+
+
+
+To execute picard run: java -jar $EBROOTPICARD/picard.jar
+Current working directory: /lustre04/scratch/zhaoze/sablefish
+Starting run at: Wed Sep 28 17:50:12 EDT 2022
+SLURM_JOBID:  32072260
+SLURM_ARRAY_TASK_ID:  48
+SLURM_ARRAY_JOB_ID:  32072051
+File Name1:  N519095/V350054058_L02_FISbcnoR164250-669_1.fq.gz
+File Name2:  N519095/V350054058_L02_FISbcnoR164250-669_2.fq.gz
+lane:  L02
+individual:  N519095
+subarrayfile1:  V350054058_L02_FISbcnoR164250-669_1.fq.gz
+subarrayfile2:  V350054058_L02_FISbcnoR164250-669_2.fq.gz
+FIRST_RG_FLOWCELL_ID:  V350054058
+FIRST_RG_LANE:  L02
+FIRST_RGID:  V350054058.L02.N519095
+FIRST_RGPU:  V350054058.L02.1
+
+V350054058_L02_FISbcnoR164250-669_2.fq.gz
+V350054058_L01_FISbcnoR164250-669_1.fq.gz
+outfile1="$individual.$lane.sorted.bam"      N519095.L02.sorted.bam
+outfile2="$individual.$lane.RG.sorted.bam"
+bamFiles=$(ls $SLURM_TMPDIR/*.RG.sorted.bam | sed 's/^/I=/g')
+outfile="$SLURM_TMPDIR/$folder.MD.RG.sorted.bam"
+
+
+
+URL: http://gofile.me/26Bp0/C4WQpT41z
+Password:  JohnTaylor2022.Sablefish!
+
+
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=15  
+#SBATCH --mem=150G 
+#SBATCH --tmp=150G
+#SBATCH -t 0-30:15 
+##################################################################
+###add read group ##########################################
+cd /lustre04/scratch/zhaoze/sablefish;
+cp ref.fasta /lustre04/scratch/zhaoze/sablefish/L519088;
+cp ref.fasta.fai /lustre04/scratch/zhaoze/sablefish/L519088;
+cp ref.dict /lustre04/scratch/zhaoze/sablefish/L519088;
+cd /lustre04/scratch/zhaoze/sablefish/L519088;
+cat V350054058_L03_FISbcnoR164275-748_1.fq.gz > L519088_L03_1.fq.gz;
+cat V350054058_L03_FISbcnoR164275-748_2.fq.gz > L519088_L03_2.fq.gz;
+gzip -d L519088_L03_1.fq.gz;
+gzip -d L519088_L03_2.fq.gz;
+module load StdEnv/2020;
+module load bowtie2/2.4.4;
+bowtie2 -x /lustre04/scratch/zhaoze/sablefish/bowtie2ref -1 /lustre04/scratch/zhaoze/sablefish/L519088/L519088_L03_1.fq -2 /lustre04/scratch/zhaoze/sablefish/L519088/L519088_L03_2.fq -S /lustre04/scratch/zhaoze/sablefish/L519088/L519088_L03.sam;
+module load samtools/1.15.1;
+samtools view -S -b L519088_L03.sam > L519088_L03.bam;  
+samtools sort L519088_L03.bam -o L519088_L03.sorted.bam;
+samtools index L519088_L03.sorted.bam;
+module load picard/2.26.3;
+java -Xms10g -Xmx38g -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups USE_JDK_INFLATER=true USE_JDK_DEFLATER=true I=L519088_L03.sorted.bam O=L519088_L03.RG.sorted.bam RGID=V350054058.L03.L519088 RGPU=V350054058.L03.1 RGPL=MGI RGLB=Lib-L519088 RGSM=L519088 VALIDATION_STRINGENCY=LENIENT
+
+
+cd /lustre04/scratch/zhaoze/sablefish;
+cp ref.fasta /lustre04/scratch/zhaoze/sablefish/L519088;
+cp ref.dict /lustre04/scratch/zhaoze/sablefish/L519088;
+cd /lustre04/scratch/zhaoze/sablefish/L519088;
+cat V350054058_L04_FISbcnoR164275-748_1.fq.gz > L519088_L04_1.fq.gz;
+cat V350054058_L04_FISbcnoR164275-748_2.fq.gz > L519088_L04_2.fq.gz;
+gzip -d L519088_L04_1.fq.gz;
+gzip -d L519088_L04_2.fq.gz;
+module load StdEnv/2020;
+module load bowtie2/2.4.4;
+bowtie2 -x /lustre04/scratch/zhaoze/sablefish/bowtie2ref -1 /lustre04/scratch/zhaoze/sablefish/L519088/L519088_L04_1.fq -2 /lustre04/scratch/zhaoze/sablefish/L519088/L519088_L04_2.fq -S /lustre04/scratch/zhaoze/sablefish/L519088/L519088_L04.sam;
+module load samtools/1.15.1;
+samtools view -S -b L519088_L04.sam > L519088_L04.bam;  
+samtools sort L519088_L04.bam -o L519088_L04.sorted.bam;
+samtools index L519088_L04.sorted.bam;
+module load picard/2.26.3;
+java -Xms10g -Xmx38g -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups USE_JDK_INFLATER=true USE_JDK_DEFLATER=true I=L519088_L04.sorted.bam O=L519088_L04.RG.sorted.bam RGID=V350054058.L04.L519088 RGPU=V350054058.L04.1 RGPL=MGI RGLB=Lib-L519088 RGSM=L519088 VALIDATION_STRINGENCY=LENIENT
+
+
+		# ---------------------------------------------------------------------
+		echo "Finished read group"
+		# ---------------------------------------------------------------------
+
+
+
+
+#### Mark Duplicate #########################################
+module load picard/2.26.3;
+java -Xms10g -Xmx37g -jar $EBROOTPICARD/picard.jar MarkDuplicates USE_JDK_INFLATER=true USE_JDK_DEFLATER=true VALIDATION_STRINGENCY=LENIENT I=L519088_L03.RG.sorted.bam I=L519088_L04.RG.sorted.bam O=L519088.MD.RG.sorted.bam M=L519088temp.MD.txt
+module load samtools/1.15.1;
+samtools index L519088.MD.RG.sorted.bam;
+
+
+
+
+		# ---------------------------------------------------------------------
+		echo "Finished mark duplicate"
+		# ---------------------------------------------------------------------
+
+
+
+###Haplotype Calling########################################
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=15  
+#SBATCH --mem=100G 
+#SBATCH --tmp=100G
+#SBATCH -t 0-30:15 
+module load nixpkgs/16.09;
+module load gatk/3.8;
+java -jar $EBROOTGATK/GenomeAnalysisTK.jar -T HaplotypeCaller -jdk_inflater -jdk_deflater --genotyping_mode DISCOVERY --emitRefConfidence GVCF -nct 12 -R ref.fasta -I N519094.MD.RG.sorted.bam -o N519094.g.vcf.gz	
+
+
+
+
+		# ---------------------------------------------------------------------
+		echo "Finished Haplotype Calling"
+		# ---------------------------------------------------------------------
+
+
+
+#### Genotyping #############################################2hour
+#!/bin/bash
+#SBATCH -J BV1
+#SBATCH --account=def-ubcxzh
+#SBATCH --cpus-per-task=15  
+#SBATCH --mem=100G 
+#SBATCH -t 0-20:15 
+module load nixpkgs/16.09;
+module load gatk/3.8;
+java -jar $EBROOTGATK/GenomeAnalysisTK.jar -jdk_inflater -jdk_deflater -T GenotypeGVCFs -R ref.fasta -V N519094.g.vcf.gz -o N519094.GT.g.vcf -nt 12;
+
+
+
+
+
+		# ---------------------------------------------------------------------
+		echo "Finished Genotyping"
+		# ---------------------------------------------------------------------
+
+
+
+
+### Hard filtering ##########################
+module load StdEnv/2020;  
+module load gcc/9.3.0;
+module load samtools/1.12; 
+module load bcftools/1.13;
+module load vcftools/0.1.16;
+cat N519094.GT.g.vcf | vcf-sort -c -p 10 > N519094.GT.sorted.g.vcf;
+bgzip -@10 N519094.GT.sorted.g.vcf;
+tabix -p vcf N519094.GT.sorted.g.vcf.gz;
+
+vcftools --gzvcf N519094.GT.sorted.g.vcf.gz --remove-indels --recode --recode-INFO-all --remove-filtered-all --min-alleles 2 --max-alleles 2 --max-missing 0.9 --maf 0.05 --out N519094.vcftools.biAllelicSNP.maf05.mm0.9
+		
+
+
+
+
+
+
+		# ---------------------------------------------------------------------
+		echo "Finished Hard filtering"
+		# ---------------------------------------------------------------------
+
+
+
+N519094.g.vcf.gz                                    135962372
+N519094.GT.g.vcf                                      3918030
+N519094.vcftools.biAllelicSNP.maf05.mm0.9.recode.vcf  2081477
+
+N519094.vcf                                          21923895
+
+
+
+
+module load nixpkgs/16.09;module load intel/2018.3;module load plink/1.07
+plink --file G1221 --missing  #检查个体丢失snp的数量，百分比，是否丢失phenotype
+cat plink.imiss   #查看丢失文件
+cat plink.lmiss
+--bfile fishsnp --allow-no-sex --allow-extra-chr --assoc --out asfish #选最高版本允许第一列chr NA
+
+
+--linear 定量形状
+--logistic 疾病
+--assoc 没有协变量
+
+
+
+#1 plink 对开始ped map 文件过滤Maf 0.001以下的SNP,其中Maf 为Na的也被过滤
+plink --file G1221 --make-bed --maf 0.001 --out G1221Maf0001  
+plink --file G1221 --make-bed --maf 0.00001 --out G1221Maf0filterd
+
+A1 为 Maf A2 为 B/B
+不用module 直接用plink 输入下面命令，选择版本  plink/1.9b_4.1-x86_64  nixpkgs/16.09 要allow no sex 和 no chr不然所以没sex 和chr的都被过滤
+plink --bfile 400fishsnp --allow-extra-chr --allow-no-sex --linear --out 400fishlinear
+
+
+plink --genome  error no missing marker 有的鱼的所有SNP的genotype都missing 为0，应删除该鱼
+
+
+a positive regression coefficient means that the minor allele increases risk/phenotype mean
+for SNP Maf is NA and 0, the p-value is NA, so 03 is BB is 2allele2 is 0
+                                               02 is AB is allele12 is 1
+                                               01 is AA is 2allele1 is 2
+
+
+
+
+
+R encoding 问题， 左上角file save as encoding, 选UTF-8
+
+
+
+
+
+https://chat.openai.com/share/0f6fb915-32d8-4e31-859f-2a67636152a4
+
+
+
+
+
+300 SNP 的名字和sequence，map 到 reference genome(contig) 上得到300 SNP 所在的contig名字和position，在600万vcf中对所有individual(小于100条鱼)包括parents
+都根据300SNP的chromosome和position 进行提取，或者写入300SNP名字，或者根据旧的600万vcf和300个SNP chromosome和position 产生新的vcf file，再
+生成ped 和 map file，在都加入第二个400鱼data中plink得到pi hat，再做relatedness找family.
+
+
+
+800的map加上contig名字和SNP location，再跟800的ped用plink转回为vcf文件，再跟223SNP的vcf合并，再合并的生成ped和map，再弄plink.genome
+ 
+ plink --vcf new223.vcf --recode --out new223 --allow-extra-chr  vcf变成ped和map
+
+ module load plink/2.00a3.6 
+ plink --file new223 --make-bed --out new223_binary  生成三个binary
+ plink --bfile new223_binary --genome --out new223_ibd --allow-extra-chr 生成.genome
+
+
+694 401 528 656 720 704 798 707 738 666 449 778 696 735 414 787 654 441  8083 8823
+
+
+引用的文章是引用最根源的那个
+
+
+
+module load plink/2.00a3.6
+plink --vcf 8083_10.vcf --make-bed --out 8083_10_plink --allow-extra-chr
+plink --bfile 8083_10_plink --maf 0.01 --geno 0.1 --hwe 1e-6 --make-bed --out 8083_10_qc --allow-extra-chr
+plink --bfile 8083_10_qc --recode-vcf --out 8083_10_for_impute --allow-extra-chr
+
+module load shapeit/2.r904
+shapeit -V newvcf8083.vcf.gz -O newvcf8083.phased.vcf.gz
+shapeit -convert --input-haps NC_018119.phased.vcf.gz(.hap去掉) --output-vcf NC_018119.phased.vcf.gz
+
+gunzip newvcf8083.vcf.gz
+bgzip newvcf8083.vcf
+tabix -p vcf newvcf8083.vcf.gz
+
+bcftools merge --merge all NC_018119.1.vcf.gz NC_018119.phased.vcf.gz -O z -o NC_018119.merged.vcf.gz --force-samples
+
+bcftools query -f '%ID\t%POS\t%REF\t%ALT\n' reference.vcf > reference.legend   # get .ledgend
+
+
+Usage: java -jar beagle.22Jul22.46e.jar [arguments]
+
+data parameters ...
+  gt=<VCF file with GT FORMAT field>                 (required)
+  ref=<bref3 or VCF file with phased genotypes>      (optional)
+  out=<output file prefix>                           (required)
+  map=<PLINK map file with cM units>                 (optional)
+  chrom=<[chrom] or [chrom]:[start]-[end]>           (optional)
+  excludesamples=<file with 1 sample ID per line>    (optional)
+  excludemarkers=<file with 1 marker ID per line>    (optional)
+
+phasing parameters ...
+  burnin=<max burnin iterations>                     (default=3)
+  iterations=<phasing iterations>                    (default=12)
+  phase-states=<model states for phasing>            (default=280)
+
+imputation parameters ...
+  impute=<impute ungenotyped markers (true/false)>   (default=true)
+  imp-states=<model states for imputation>           (default=1600)
+  cluster=<max cM in a marker cluster>               (default=0.005)
+  ap=<print posterior allele probabilities>          (default=false)
+  gp=<print posterior genotype probabilities>        (default=false)
+
+general parameters ...
+  ne=<effective population size>                     (default=100000)
+  err=<allele mismatch probability>                  (default: data dependent)
+  em=<estimate ne and err parameters (true/false)>   (default=true)
+  window=<window length in cM>                       (default=40.0)
+  overlap=<window overlap in cM>                     (default=2.0)
+  seed=<random seed>                                 (default=-99999)
+  nthreads=<number of threads>                       (default: machine dependent)
+
+
+
+https://academic.oup.com/nar
+https://academic.oup.com/bib/article/23/3/bbac090/6562683
+
+
+有最开始400条鱼的1X sequence的600000个variants 其中包含error和不准确。有多于50条鱼每个有20X sequence的6百万SNPs 的fasta read file, 用bowtie map 到reference genome上，作SNP calling 得到vcf file，再建立得到LD。用LD 对400条鱼的1X sequence的600000个variants imputation。可以通过LD对400鱼的SNP修正和imputation。haplotype为一条链，包含若干LD。用7个parents的vcf尝试建立LD。任意两个parents的vcf可以得到父和母对每个SNP的genotype，若父SNP1为AA 母AB 则可得到后代 SNP1 为AA AB的概率分别为50%。可对所有SNP做相同。
+
+
+用找任意不重复1000个study做subset适用第一种固定mu sigma的方法得到的estimate的mu和sigma的分别均值在study总数很多的情况下与真实的mu0 和b/(a-1) 近似，但sigma0 和inverse gamma的方差与真值差别较大，由于取的不同study的noise不同则不可以假设方差相同。方差会比实际大。而由于数据相似mu的差距不大则估计的mu在样本大时接近真值。   改变mu0 和sigma0设置较小，study尽量小。 改变subset的大小，变小的时候看估计的mui的方差和inverse gamma的方差变化情况曲线找合适的subset大小。  optm函数即使有好初始值也不一定好结果 
+
+Access key ID      AKIARYDOQKCAY64FJUN7
+Secret access key  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
+
+aws s3 ls s3://g1223-29-ges/  查看文件夹内容
+
+cd /d E:\zhaoze\fish\haploview\rclone\rclone-v1.66.0-windows-amd64
+
+
+
+​
+Zhaoze Liu
+​
+找joint cresbounding
+https://www.letpub.com.cn/index.php?page=journalapp&view=search  找影响因子10分
+
+https://www.sciencedirect.com/journal/environmental-research/publish/guide-for-authors
+pollution, enviromental
+library sbscribe 找open access
+arxive
+
+3.1  3.2 合在一起    F2.1对biotoxin 搞个红箭头或者红圈，说点biotoxin 也有相似的东西
+F2.2找个弯一点曲线
+
+找web application相关文章
+在最后面引用youshuai文章。
+找journal list
+
+看artical type，介绍result
+letter to editor/ application note
+
+
+discuss 10%-20%
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
